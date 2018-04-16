@@ -21,13 +21,16 @@ require "tetrominoer"
 
 module Tetrominoer
 
-  o = O.new()
-  l = L.new()
-  r = R.new()
+  o = Tetrominoer::O.new()
+  l = Tetrominoer::L.new()
+  r = Tetrominoer::R.new()
   i = I.new()
   s = S.new()
   z = Z.new()
-  t = T.new()
+  t = Tetrominoer::T.new()
+  corner = Tetrominoer::Corner.new()
+  small_i = Tetrominoer::SmallI.new()
+  box = Tetrominoer::Box.new()
 
 choices = false
 #-----------Configuration----------------------------------
@@ -35,20 +38,22 @@ choices = false
   #Edit these if you want to narrow the number of possible pieces for a solution
   #Block array lets you chose which blocks you want avaibiale
   #Choices gives you the maximum number of the corresponding block in its index
-  block_array = [o,l,r,i,s,z,t]
-# choices =     [2,1,2,1]
-# block_array = [t,r,l,z]
+  #block_array = [o,l,r,i,s,z,t]
+#  choices =     [2,2,3,2,2,10]
+  #block_array = [r,l,box]
 
+  block_array = [box, l, r, corner, small_i, t]
+  choices = [1, 2, 2, 3, 2, 1]
   #This is the size of the board you are putting your tetrominos on
-  rows = 4
-  columns = 3
+  rows = 6
+  columns = 6
 
   #Set to false if you don't want to be shown solutions until all have been found
   quickprint = true
-  
+
 #-------------End of Configuration-------------------------
 
-  pg = PossibilityGenerator.new(rows,columns)
+  pg = Tetrominoer::PossibilityGenerator.new(rows, columns)
   pg.generate(block_array)
   possibilities = pg.possibility_space
 
@@ -58,13 +63,13 @@ choices = false
     solver = Solver.new(possibilities, block_array, rows, columns, choices, quickprint)
   else
     solver = Solver.new(possibilities, block_array, rows, columns)
-  end    
+  end
 
   solutions = solver.solve(possibilities)
 
   if solutions
     printer = Printer.new(rows, columns)
-    solutions.each do |solution| 
+    solutions.each do |solution|
       puts ''
       output = printer.convert_solution(solution, possibilities)
       printer.print(output, block_array)

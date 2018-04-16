@@ -17,7 +17,7 @@
 
 module Tetrominoer
 
-  
+
   class Printer
     def initialize(rows, columns)
       @rows = rows
@@ -32,7 +32,7 @@ module Tetrominoer
       solution.each_with_index do |sol_row, sol_index|
         #Find the block name for the placement
         block_identifier_array = sol_row[0..(blocks_number-1)]
-        block_name = block_array[block_identifier_array.index(1)].NAME
+        block_name = block_array[block_identifier_array.index(1)].name
 
         space_index = true
         occupied_spaces = sol_row[blocks_number..-1]
@@ -57,11 +57,11 @@ module Tetrominoer
 
     def convert_solution(solution, possibilities)
       output = Array.new
-      solution.each do |s_key| 
+      solution.each do |s_key|
         output << possibilities[s_key]
       end
       return output
     end
-    
+
   end
 end

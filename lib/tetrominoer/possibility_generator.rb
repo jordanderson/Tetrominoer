@@ -18,18 +18,18 @@ module Tetrominoer
 
   class PossibilityGenerator
     @possibility_space = Array.new
-    attr_reader :possibility_space
+    attr_accessor :possibility_space, :cell_space, :block_array, :block_possibilities
 
     def initialize(rows, columns)
-      @ROWS = rows
-      @COLUMNS = columns
+      @rows = rows
+      @columns = columns
 
-      #Define our posibility space with the user given x and y sizes 
+      #Define our posibility space with the user given x and y sizes
       #as a multidimensional array, initialized to 0
-      @possibility_space = Array.new#(@ROWS) {Array.new(@COLUMNS){0}}
-      
+      @possibility_space = Array.new#(@rows) {Array.new(@columns){0}}
+
       #A column for every cell in the puzzle space
-      @cell_space = Array.new(@ROWS*@COLUMNS,0)
+      @cell_space = Array.new(@rows*@columns,0)
     end
 
     #INPUT array of the blocks to be used
@@ -39,19 +39,20 @@ module Tetrominoer
     #and add blank spaces to the front.
     #
     #Each map that has all four pieces of the block is a posibility.
-    #When the space array has only 3 pieces, discard that map and 
+    #When the space array has only 3 pieces, discard that map and
     #continue onto the next configuration.
     #
     #When all blocks are exhausted, return the possibilty rows with the
     #block matrix attached
     def generate_inner(block_array)
+      @block_array = block_array
       #Find every possible row of every config for every block
       block_array.each_with_index do |block, block_index|
-        block_possibilities = Array.new
+        @block_possibilities = Array.new
         #Find possible rows for every config of this block
-        block.CONFIGS.each do |config|
+        block.shape.each do |config|
           #The config cannot fit if it's too big for the board
-          if config[:rows] > @ROWS or config[:columns] > @COLUMNS
+          if config[:rows] > @rows or config[:columns] > @columns
             next
           end
           #The first map of the block config on the space array
@@ -66,12 +67,12 @@ module Tetrominoer
               cell_space_map[space_index] = config[:config][config_index]
               config_index += 1
               space_index += 1
-              if space_index % @COLUMNS 
+              if space_index % @columns
               end
             end
             #Move to the next row of the cell_space_map if we are going to the next row of the config
-            if space_index % @COLUMNS > 0
-              space_index += @COLUMNS - (space_index % @COLUMNS)
+            if space_index % @columns > 0
+              space_index += @columns - (space_index % @columns)
             end
           end
           #We will return this as all the possible spaces of a config
@@ -81,38 +82,43 @@ module Tetrominoer
           #The index of the first piece of the config
           index_of_first_piece = 0
           #Our first map is a possibility
-          #Our currently testing possibility, 
+          #Our currently testing possibility,
           possibility = cell_space_map
           #When a piece of the block has fallen off the end of the board, throw it away and terminate the loop.
-          until possibility.count(1) < 4 #TODO magic number
+          pp possibility.count(1)
+          pp config_possibilities_index
+          pp block_possibilities
+          pp config_possibilities
+          until config_possibilities_index > @rows*@columns || possibility.count(1) < block.shortest_edge_size #TODO magic number
             config_possibilities[config_possibilities_index] = possibility.dup
             #Shift the block forward across the space_array
             possibility.pop
             possibility.unshift(0)
             index_of_first_piece += 1
 
-            #Check to see if the block is split across the right boarder of the space_map
-            #Wastefull of 2-3 loops because we'll pop the number of columns off 
+            #Check to see if the block is split across the right border of the space_map
+            #Wastefull of 2-3 loops because we'll pop the number of columns off
             #when we hit the end of the cell_space_map
             column_number = 1
             while column_number < config[:columns]
-              if (index_of_first_piece + config[:columns]) % @COLUMNS == column_number
+              if (index_of_first_piece + config[:columns]) % @columns == column_number
                 possibility.pop
                 possibility.unshift(0)
                 index_of_first_piece += 1
               end
-              column_number +=1
+              column_number += 1
             end
 
-            config_possibilities_index += 1            
+            config_possibilities_index += 1
           end
+          puts index_of_first_piece
           #Add the generated possibilties of this config to the total possibilities for the block
           block_possibilities += config_possibilities
         end #End of config possibilties loop
         #TODO append block identifier to possibility row
         block_identifier_array = Array.new(block_array.length,0)
         block_identifier_array[block_index] = 1
-        block_possibilities.collect!{ |config_possibility| 
+        block_possibilities.collect!{ |config_possibility|
           block_identifier_array + config_possibility}
         @possibility_space += block_possibilities
       end #End of block possibilities loop
@@ -133,5 +139,3 @@ module Tetrominoer
 
   end
 end
-
-

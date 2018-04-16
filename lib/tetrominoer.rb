@@ -21,14 +21,13 @@ require 'tetrominoer/possibility_generator'
 require 'tetrominoer/solver'
 require 'tetrominoer/printer'
 
-
 module Tetrominoer
 
   class Runner
 
     def initialize(options)
     end
-    
+
   end
-  
+
 end

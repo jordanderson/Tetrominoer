@@ -22,7 +22,7 @@ module Tetrominoer
       @block_number = block_array.length
       @spaces = @possibility_size - @block_number
       #number of blocks necessary to fill the board, assumes all blocks are the same size
-      @solution_size = (@possibility_size - @block_number)/block_array[0].SIZE
+      @solution_size = (@possibility_size - @block_number)/block_array[0].size
       @solutions = Array.new
       @possibility_space = possibility_space
       @choices = choices
@@ -39,9 +39,9 @@ module Tetrominoer
     #PARAMS Hash<Array[Integer]>, Array[Integer]
     #Takes in a list of all possible block placements, and a list of current proposed placements
     #for a solutions. The numbers in the solution candidate are the keys of the block placements
-    
+
     #SUMMARY Recuring function which aims to reduce the number of possible block placements
-    # until there are no avaliable block placements to fill the current empty spaces, 
+    # until there are no avaliable block placements to fill the current empty spaces,
     # or a solution is found. The method creates a search tree.
     def solve(possibility_space, solution_candidate = Array.new)
 
@@ -49,14 +49,14 @@ module Tetrominoer
       if @choices
         @choices.each_with_index do |choice, index|
           block_count = 0
-          solution_candidate.each do |candidate| 
+          solution_candidate.each do |candidate|
            if @possibility_space[candidate][index] == 1
              block_count += 1
            end
-        if block_count > choice
-          return
-        end
-        end
+           if block_count > choice
+            return
+           end
+         end
         end
       end
 
@@ -77,8 +77,8 @@ module Tetrominoer
           return
         end
       end
-      
-      #If there are no blocks(rows) in the possibility 
+
+      #If there are no blocks(rows) in the possibility
       #space which fit into this space(column) kill this leaf
       column = @block_number
       empty = possibility_space.select{ |k,v| v[column] == 1 }
@@ -111,7 +111,7 @@ module Tetrominoer
             occupied_spaces << space_index
           end
         end
-        
+
         #Control for the block identifier row
         occupied_spaces.map!{ |index| index + @block_number }
 
@@ -119,7 +119,7 @@ module Tetrominoer
         #Delete possibilities which overlap with the chosen block placement
         pspace.each do |p_key, p|
           flag = false
-          occupied_spaces.each do |space| 
+          occupied_spaces.each do |space|
             if p[space] == 1
               flag = true
             end
